@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  bingsuCoinsTrans
+
+  Sample SAM Template for bingsuCoinsTrans
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.8
+    Environment:
+      Variables:
+        CARBON_COINS_TRANS_TABLE: !Ref BingsuCoinsTransTable
+
+Resources:
+  GetAllCoinsTransById:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: bingsuCoinsTrans/
+      Handler: app.get_bingu_coins_transaction
+  AddCoinsTrans:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: bingsuCoinsTrans/
+      Handler: app.add_bingsu_coins_transaction
+
+  BingsuCoinsTransTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: coin_transaction_id
+          AttributeType: S
+        - AttributeName: date_time
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: coin_transaction_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: date_time
+          KeySchema:
+            - AttributeName: date_time
+              KeyType: HASH
+          Projection: 
+            ProjectionType: ALL
+      TableName: "BingsuCoinsTrans"
+
+Outputs:
+  GetAllCoinsTransById:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt GetAllCoinsTransById.Arn
+  GetAllCoinsTransByIdIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt GetAllCoinsTransByIdRole.Arn
